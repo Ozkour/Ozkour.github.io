@@ -16,7 +16,10 @@
             .append("svg");
         
             d3.csv('./chi-data.csv', function(data){
-                origins .push(data.forEach(function(d) { return [ + d.y2016, + d.y2017 + d.y2018 + d.y2019 ] }));
+                data.forEach(function(d) { 
+                    origins.push(d.y2016,d.y2017,d.y2018,d.y2019);
+                 });
+                
             });
             console.log(origins);
         </script>
