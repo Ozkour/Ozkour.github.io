@@ -12,16 +12,28 @@
     <body>
         <script>
             var origins = [];
+            const counts = {};
+            function pushDataIfNotEmpty(d){
+                if(d != ""){
+                    origins.push(d);
+                }
+            }
             d3.select("body")
             .append("svg");
         
             d3.csv('./chi-data.csv', function(data){
                 data.forEach(function(d) { 
-                    origins.push(d.y2016,d.y2017,d.y2018,d.y2019);
+                    pushDataIfNotEmpty(d.y2016);
+                    pushDataIfNotEmpty(d.y2017);
+                    pushDataIfNotEmpty(d.y2018);
+                    pushDataIfNotEmpty(d.y2019);
+                    //origins.push(d.y2016,d.y2017,d.y2018,d.y2019);
                  });
-                
-            });
-            console.log(origins);
+                 origins.forEach(country => {
+                    counts[country] = counts[country] ? counts[country] + 1 : 1;
+                 });
+                console.log(counts);
+            }); 
         </script>
 
 
