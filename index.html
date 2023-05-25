@@ -1,112 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Test PJI</title>
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <link rel="stylesheet" href="">
-        <style>
-        </style>
-        <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-    </head>
-    <body>
-        <script>
-            var origins = [];
-            const counts = new Map();
-            function pushDataIfNotEmpty(d){
-                if(d != ""){
-                    origins.push(d);
-                }
-            }
-            
-            const w = 1300;
-            const h = 700;
-            const padding = 110;
+<meta charset="UTF-8">
+<title>Page Title</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="">
+<style>
+</style>
+<body>
 
-            
-
-            const svg = d3.select("body")
-                        .append("svg")
-                        .attr("width", w)
-                        .attr("height", h);
-
-            d3.csv('./chi-data.csv', function(data){
-                data.forEach(function(d) { 
-                    pushDataIfNotEmpty(d.y2016);
-                    pushDataIfNotEmpty(d.y2017);
-                    pushDataIfNotEmpty(d.y2018);
-                    pushDataIfNotEmpty(d.y2019);
-                 });
-                 origins.forEach(country => {
-                    counts.set(country,counts.get(country) ? counts.get(country) + 1 : 1);
-                 });
-                
-                const countValues = Array.from(counts.values())
-                const countries = Array.from(counts.entries())
-
-                const xScale = d3.scaleLinear()
-                    .domain([0, countValues.length])
-                    .range([padding, w - padding]);
-
-                const yScale = d3.scaleSqrt()
-                    .domain([1, d3.max(countValues)])
-                    .range([padding, h - 2*padding]);
-
-                const yScale2 = d3.scaleSqrt()
-                    .domain([1,d3.max(countValues)])
-                    .range([h - 2*padding, padding]);
-
-                console.log(countries);
-
-                svg.selectAll("rect")
-                    .data(countValues)
-                    .enter()
-                    .append("rect")
-                    .attr("x", (d, i) => xScale(i))
-                    .attr("y", (d, i) => h - yScale(d) - padding)
-                    .attr("width", 10) 
-                    .attr("height", (d, i) => yScale(d))
-                    .attr("fill", "navy")
-                    .attr("class", "bar")
-                    .append("title")
-                    .text((d) => d);
-
-                const yAxis = d3.axisLeft(yScale2);
-
-
-                svg.append("g")
-                .attr("transform", "translate("+padding+",0)")
-                .call(yAxis);
-
-                svg.append("g")
-                .selectAll("text")
-                .data(countries)
-                .enter()
-                .append("text")
-                .text((d) => d[0])
-                .attr("x", (d, i) => h - padding)
-                .attr("y", (d, i) => - xScale(i) -1)
-                .attr("class", "barTitle")
-                .attr("transform", "rotate(90)")
-                .attr("font-size", "13");
-
-                svg.append("g")
-                .append("text")
-                .text("Nombre de participants par pays à la conférence CHI (2016-2019)")
-                .attr("x", 300)
-                .attr("y", 125)
-                .attr("font-size", 20)
-                .attr("text-decoration", "underline")
-
-
-
-            }); 
-            
-        
-            
-        </script>
-
-
-
-    </body>
+    <a href="./src/chi-attendees.html">Nombre de participants par pays à la conférence CHI entre 2016 et 2019</a>
+    <a href="./src/chi-attendees-click.html">One select bar</a>
+    <a href="./dc.js-4.0.0/web-src/">dc example</a>
+</body>
 </html> 

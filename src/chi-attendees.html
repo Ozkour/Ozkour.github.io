@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Test PJI</title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <link rel="stylesheet" href="">
+        <style>
+            .bar:hover {
+              fill: brown;
+            }
+          </style>
+        <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
+        <script src="../scripts/dc.js"></script>
+    </head>
+    <body>
+        <script>
+            var continents;
+            
+            function pushDataIfNotEmpty(d, origins){
+                if(d != ""){
+                    origins.push(d);
+                }
+            }
+            
+            const w = 1300;
+            const h = 700;
+            const padding = 110;
+
+        
+
+            function displayPlot(data, year = null){
+                var origins = [];
+                const counts = new Map();
+                const svg = d3.select("body")
+                        .append("svg")
+                        .attr("width", w)
+                        .attr("height", h);
+                data.forEach(function(d) { 
+                    if(year == 2016){
+                        pushDataIfNotEmpty(d.y2016, origins);
+                    } else if (year == 2017){
+                        pushDataIfNotEmpty(d.y2017, origins);
+                    } else if (year == 2018) {
+                        pushDataIfNotEmpty(d.y2018, origins);
+                    } else if (year == 2019){
+                        pushDataIfNotEmpty(d.y2019, origins);
+                    } else {
+                        pushDataIfNotEmpty(d.y2016, origins);
+                        pushDataIfNotEmpty(d.y2017, origins);
+                        pushDataIfNotEmpty(d.y2018, origins);
+                        pushDataIfNotEmpty(d.y2019, origins);
+                    }
+                 });
+                 origins.forEach(country => {
+                    counts.set(country,counts.get(country) ? counts.get(country) + 1 : 1);
+                 });
+                
+                
+                const countValues = Array.from(counts.values())
+                const countries = Array.from(counts.entries())
+
+                d3.csv('../Countries-Continents.csv', function(data){
+                    continents = new Map(data.map(d => [d.Country, d.Continent]));
+                    countries.forEach(country => {
+                        country.push(continents.get(country[0]));
+                    });
+                    countries.sort(function(a, b) {
+                        return (a[2] < b[2]) ? -1 : (a[2] > b[2]) ? 1 : 0; 
+                    });
+                    const xScale = d3.scaleLinear()
+                    .domain([0, countValues.length])
+                    .range([padding, w - padding]);
+
+                const yScale = d3.scaleSqrt()
+                    .domain([1, d3.max(countValues)])
+                    .range([padding, h - 2*padding]);
+
+                const yScale2 = d3.scaleSqrt()
+                    .domain([1,d3.max(countValues)])
+                    .range([h - 2*padding, padding]);
+
+
+                svg.selectAll("rect")
+                    .data(countries)
+                    .enter()
+                    .append("rect")
+                    .attr("x", (d, i) => xScale(i))
+                    .attr("y", (d, i) => h - yScale(d[1]) - padding)
+                    .attr("width", 10) 
+                    .attr("height", (d, i) => yScale(d[1]))
+                    .attr("fill", function(d) {
+                        if(d[2] == 'Asia'){
+                            return "yellow"
+                        } else if(d[2] == 'Africa'){
+                            return "plum"
+                        } else if (d[2] == 'Europe'){
+                            return "skyblue"
+                        } else if (d[2] == 'North America'){
+                            return "red"
+                        } else if (d[2] == 'South America'){
+                            return "orange"
+                        } else if (d[2] == 'Oceania'){
+                            return "navy"
+                        }
+                    })
+                    .attr("class", "bar")
+                    .append("title")
+                    .text((d) => d[1]);
+
+                const yAxis = d3.axisLeft(yScale2);
+
+ 
+                svg.append("g")
+                .attr("transform", "translate("+padding+",0)")
+                .call(yAxis);
+
+                svg.append("g")
+                .selectAll("text")
+                .data(countries)
+                .enter()
+                .append("text")
+                .text((d) => d[0])
+                .attr("x", (d, i) => h - padding)
+                .attr("y", (d, i) => - xScale(i) -1)
+                .attr("class", "barTitle")
+                .attr("transform", "rotate(90)")
+                .attr("font-size", "13");
+
+                if(year){
+                    year = year.toString();
+                } else{
+                    year = "2016-2019";
+                }
+
+                svg.append("g")
+                .append("text")
+                .text("Nombre de participants par pays à la conférence CHI (".concat(year).concat(")"))
+                .attr("x", 300)
+                .attr("y", 125)
+                .attr("font-size", 20)
+                .attr("text-decoration", "underline")
+                });
+
+                svg.append("circle").attr("cx",1100).attr("cy",60).attr("r", 6).style("fill", "plum")
+                svg.append("text").attr("x", 1110).attr("y", 62).text("Africa").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",80).attr("r", 6).style("fill", "yellow")
+                svg.append("text").attr("x", 1110).attr("y", 82).text("Asia").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",100).attr("r", 6).style("fill", "skyblue")
+                svg.append("text").attr("x", 1110).attr("y", 102).text("Europe").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",120).attr("r", 6).style("fill", "red")
+                svg.append("text").attr("x", 1110).attr("y", 122).text("North America").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",140).attr("r", 6).style("fill", "navy")
+                svg.append("text").attr("x", 1110).attr("y", 142).text("Oceania").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",160).attr("r", 6).style("fill", "orange")
+                svg.append("text").attr("x", 1110).attr("y", 162).text("South America").style("font-size", "15px").attr("alignment-baseline","middle")
+            }
+
+            d3.csv('../chi-data.csv', displayPlot); 
+            d3.csv('../chi-data.csv', (d) => displayPlot(d, 2016)); 
+            d3.csv('../chi-data.csv', (d) => displayPlot(d, 2017)); 
+            d3.csv('../chi-data.csv', (d) => displayPlot(d, 2018)); 
+            d3.csv('../chi-data.csv', (d) => displayPlot(d, 2019)); 
+        </script>
+
+
+
+    </body>
+</html> 
