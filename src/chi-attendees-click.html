@@ -44,7 +44,7 @@ function pushDataIfNotEmpty(d, origins){
 }
 var continents;
 const w = 1300;
-const h = 700;
+const h = 1000;
 const padding = 110;
 var chart = new dc.BarChart("#countries");
 var chart2 = new dc.BarChart("#test");
@@ -164,11 +164,20 @@ d3.csv("../chi-data.csv").then(function(data){
           .x(d3.scaleBand())
           .xUnits(dc.units.ordinal)
           .brushOn(true)
+          .y(yScale)
           .yAxisLabel("This is the Y Axis!")
           .dimension(countryDimension)
           .group(sumGroup)
           .controlsUseVisibility(true)
           .addFilterHandler(function(filters, filter) {return [filter];}); // this
+
+          chart.renderlet(function(chart){
+          chart.selectAll("g.x text")
+            .attr('transform', "rotate(-90)")
+            .attr('dx',"-30")
+            .attr('float', 'end')
+            
+});
         chart.render();
     
       });
