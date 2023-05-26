@@ -26,34 +26,156 @@
   </div>
 </div>
 
+<div id="countries">
+  <div>
+    <a class="reset" style="visibility: hidden" href="javascript:chart.filterAll();dc.redrawAll();">reset</a>
+  </div>
+</div>
+
 <script type="text/javascript" src="../scripts/d3.js"></script>
 <script type="text/javascript" src="../scripts/crossfilter.js"></script>
 <script type="text/javascript" src="../scripts/dc.js"></script>
 <script type="text/javascript">
 
-
-var chart = new dc.BarChart("#test");
+function pushDataIfNotEmpty(d, origins){
+  if(d != ""){
+      origins.push(d);
+  }
+}
+var continents;
+const w = 1300;
+const h = 700;
+const padding = 110;
+var chart = new dc.BarChart("#countries");
+var chart2 = new dc.BarChart("#test");
 d3.csv("morley.csv").then(function(experiments) {
 
   experiments.forEach(function(x) {
     x.Speed = +x.Speed;
   });
 
+  
+  console.log(experiments);
   var ndx                 = crossfilter(experiments),
       runDimension        = ndx.dimension(function(d) {return +d.Run;}),
       speedSumGroup       = runDimension.group().reduceSum(function(d) {return d.Speed * d.Run / 1000;});
 
-    chart
+    chart2
     .width(768)
     .height(480)
-    .x(d3.scaleLinear().domain([6,20]))
+    .x(d3.scaleBand())
+    .xUnits(dc.units.ordinal)
     .brushOn(true)
     .yAxisLabel("This is the Y Axis!")
     .dimension(runDimension)
     .group(speedSumGroup)
     .controlsUseVisibility(true)
     .addFilterHandler(function(filters, filter) {return [filter];}); // this
-    chart.render();
+    chart2.render();
+});
+
+d3.csv("../chi-data.csv").then(function(data){
+  var origins = [];
+  const counts = new Map();
+  const svg = d3.select("body")
+          .append("svg")
+          .attr("width", w)
+          .attr("height", h);
+  data.forEach(function(d) { 
+      // if(year == 2016){
+      //     pushDataIfNotEmpty(d.y2016, origins);
+      // } else if (year == 2017){
+      //     pushDataIfNotEmpty(d.y2017, origins);
+      // } else if (year == 2018) {
+      //     pushDataIfNotEmpty(d.y2018, origins);
+      // } else if (year == 2019){
+      //     pushDataIfNotEmpty(d.y2019, origins);
+      // } else {
+          pushDataIfNotEmpty(d.y2016, origins);
+          pushDataIfNotEmpty(d.y2017, origins);
+          pushDataIfNotEmpty(d.y2018, origins);
+          pushDataIfNotEmpty(d.y2019, origins);
+      //}
+    });
+    origins.forEach(country => {
+      counts.set(country,counts.get(country) ? counts.get(country) + 1 : 1);
+    });
+  
+  
+  const countValues = Array.from(counts.values());
+  const countries = Array.from(counts.entries());
+
+  d3.csv('../Countries-Continents.csv').then(function(data){
+    //console.log(data)
+      continents = new Map(data.map(d => [d.Country, d.Continent]));
+      countries.forEach(country => {
+          country.push(continents.get(country[0]));
+      });
+      countries.sort(function(a, b) {
+          return (a[2] < b[2]) ? -1 : (a[2] > b[2]) ? 1 : 0; 
+      });
+      const xScale = d3.scaleLinear()
+      .domain([0, countValues.length])
+      .range([padding, w - padding]);
+
+    const yScale = d3.scaleSqrt()
+        .domain([1, d3.max(countValues)])
+        .range([padding, h - 2*padding]);
+
+    const yScale2 = d3.scaleSqrt()
+        .domain([1,d3.max(countValues)])
+        .range([h - 2*padding, padding]);
+    
+    //console.log(Array.from(countries))
+    
+    
+
+    let dataCountry = countries.map(function(d, i) {
+      return {
+        name: d[0]
+        , val: d[1]
+        , continent: d[2]
+      }
+    });
+
+
+    var dataC = [
+      {
+      name: "bla", 
+      val: 5}
+      ,
+      {name: "blabla",
+       val: 8
+      }
+    ];
+    console.log(dataC)
+    //console.log(Promise.all(dataCountry))
+    Promise.all(dataCountry).then(function(country){
+      //console.log(country)
+        var ndx                 = crossfilter(country),
+        countryDimension        = ndx.dimension(function(d) {return d.name;}),
+        sumGroup                = countryDimension.group().reduceSum(function(d) {return d.val;});
+        
+
+
+        chart
+          .width(w)
+          .height(h)
+          .x(d3.scaleBand())
+          .xUnits(dc.units.ordinal)
+          .brushOn(true)
+          .yAxisLabel("This is the Y Axis!")
+          .dimension(countryDimension)
+          .group(sumGroup)
+          .controlsUseVisibility(true)
+          .addFilterHandler(function(filters, filter) {return [filter];}); // this
+        chart.render();
+    
+      });
+      
+
+    
+  });
 });
 
 </script>
