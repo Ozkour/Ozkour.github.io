@@ -11,7 +11,7 @@
             }
           </style>
         <script src="https://d3js.org/d3.v4.min.js" charset="utf-8"></script>
-        <script src="../scripts/dc.js"></script>
+        
     </head>
     <body>
         <script>
@@ -142,6 +142,7 @@
                 .attr("text-decoration", "underline")
                 });
 
+
                 svg.append("circle").attr("cx",1100).attr("cy",60).attr("r", 6).style("fill", "plum")
                 svg.append("text").attr("x", 1110).attr("y", 62).text("Africa").style("font-size", "15px").attr("alignment-baseline","middle")
                 svg.append("circle").attr("cx",1100).attr("cy",80).attr("r", 6).style("fill", "yellow")
@@ -161,6 +162,19 @@
             d3.csv('../chi-data.csv', (d) => displayPlot(d, 2017)); 
             d3.csv('../chi-data.csv', (d) => displayPlot(d, 2018)); 
             d3.csv('../chi-data.csv', (d) => displayPlot(d, 2019)); 
+
+            d3.csv('../flight_database_full.csv', function(data){
+                var carbon = new Map();
+                var time = new Map();
+                var cpt = new Map();
+                data.forEach(function(d){
+                    var seconds = d.temps_vol.split(":");
+                    seconds = parseInt(seconds[0])*3600 + parseInt(seconds[1])*60 + parseInt(seconds[2])
+                    cpt.set(d.arrivee, cpt.get(d.arrivee) ? cpt.get(d.arrivee) + 1 : 1);
+                    carbon.set(d.arrivee, carbon.get(d.arrivee) ? (carbon.get(d.arrivee)*(cpt.get(d.arrivee)-1) + d.emission_CO2) / cpt.get(d.arrivee) : d.emission_CO2);
+                    time.set(d.arrivee, time.get(d.arrivee) ? (time.get(d.arrivee)*(cpt.get(d.arrivee)-1) + seconds) / cpt.get(d.arrivee) : seconds);
+                });
+            });
         </script>
 
 
