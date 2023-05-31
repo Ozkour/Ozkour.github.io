@@ -177,7 +177,7 @@
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
                 .append("g")
-                    .attr("transform", "translate(" + width / 2 + "," + ( height/2+100 )+ ")"); // Add 100 on Y translation, cause upper bars are longer
+                    .attr("transform", "translate(" + width / 2 + "," + ( height/2+50 )+ ")"); // Add 100 on Y translation, cause upper bars are longer
 
 
                 var carbon = new Map();
@@ -208,7 +208,7 @@
                     .call(g => g.append("text")
                         .attr("y", d => -y(y.ticks(5).pop()))
                         .attr("dy", "-1em")
-                        .text("Temps de vol"))
+                        .text("Temps de vol moyen (heures)"))
                     .call(g => g.selectAll("g")
                     .data(y.ticks(5).slice(1))
                     .enter()
@@ -226,7 +226,7 @@
                             .text(y.tickFormat(5, "s"))
                         .clone(true)
                             .attr("fill", "#000")
-                            .attr("stroke", "none")))
+                            .attr("stroke", "none")));
                     
 
                 // Add bars
@@ -258,6 +258,7 @@
                         .attr("transform", function(d) { return (x(d[0]) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
                         .style("font-size", "11px")
                         .attr("alignment-baseline", "middle");
+                    
                 
                 svg.append("g")
                     .call(yAxis);
