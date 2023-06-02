@@ -273,7 +273,6 @@
                 svg.append("g")
                     .call(yAxis);
 
-                console.log(carbon);
                 
 
 
@@ -362,7 +361,11 @@
                     .padding([0.2])
                 svg.append("g")
                     .attr("transform", "translate(0," + (heightAttendees - 50) + ")")
-                    .call(d3.axisBottom(x).tickSizeOuter(0));
+                    .call(d3.axisBottom(x).tickSizeOuter(0))
+                    .selectAll("text")
+                    .style("text-anchor", "start")
+                    .attr("transform", "translate(12,0),rotate(45)")
+                    .attr("font-size", "13");
 
                 // Add Y axis
                 var y = d3.scaleSqrt()
@@ -381,6 +384,7 @@
                     .keys(subgroups)
                     (data)
 
+
                 // Show the bars
                 svg.append("g")
                     .selectAll("g")
@@ -396,6 +400,8 @@
                         .attr("y", function(d) { return y(d[1]); })
                         .attr("height", function(d) { return y(d[0]) - y(d[1]); })
                         .attr("width",x.bandwidth())
+                        .append("title")
+                        .text((d) => d[1]-d[0]);
             });
         </script>
         
