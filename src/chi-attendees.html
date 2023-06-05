@@ -145,17 +145,17 @@
 
 
                 svg.append("circle").attr("cx",1100).attr("cy",60).attr("r", 6).style("fill", "plum")
-                svg.append("text").attr("x", 1110).attr("y", 62).text("Africa").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("text").attr("x", 1110).attr("y", 65).text("Africa").style("font-size", "15px").attr("alignment-baseline","middle")
                 svg.append("circle").attr("cx",1100).attr("cy",80).attr("r", 6).style("fill", "yellow")
-                svg.append("text").attr("x", 1110).attr("y", 82).text("Asia").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("text").attr("x", 1110).attr("y", 85).text("Asia").style("font-size", "15px").attr("alignment-baseline","middle")
                 svg.append("circle").attr("cx",1100).attr("cy",100).attr("r", 6).style("fill", "skyblue")
-                svg.append("text").attr("x", 1110).attr("y", 102).text("Europe").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("text").attr("x", 1110).attr("y", 105).text("Europe").style("font-size", "15px").attr("alignment-baseline","middle")
                 svg.append("circle").attr("cx",1100).attr("cy",120).attr("r", 6).style("fill", "red")
-                svg.append("text").attr("x", 1110).attr("y", 122).text("North America").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("text").attr("x", 1110).attr("y", 125).text("North America").style("font-size", "15px").attr("alignment-baseline","middle")
                 svg.append("circle").attr("cx",1100).attr("cy",140).attr("r", 6).style("fill", "navy")
-                svg.append("text").attr("x", 1110).attr("y", 142).text("Oceania").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("text").attr("x", 1110).attr("y", 145).text("Oceania").style("font-size", "15px").attr("alignment-baseline","middle")
                 svg.append("circle").attr("cx",1100).attr("cy",160).attr("r", 6).style("fill", "orange")
-                svg.append("text").attr("x", 1110).attr("y", 162).text("South America").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("text").attr("x", 1110).attr("y", 165).text("South America").style("font-size", "15px").attr("alignment-baseline","middle")
             }
 
             d3.csv('../chi-data.csv', displayPlot); 
@@ -312,20 +312,19 @@
                     .attr("text-anchor", "end")
                     .attr("x", widthCarbon/2 + margin.left)
                     .attr("y", heightCarbon + 37)
-                    .text("CO2 estimation (kg)");
+                    .text("Moyenne des estimations de CO2 (arrondi au kg)");
 
                 //Bars
                 svg.selectAll("myRect")
                     .data(carbon)
-                    .enter()
-                    .append("rect")
-                    .attr("x", x(0) )
-                    .attr("y", function(d) { return y(d[0]); })
-                    .attr("width", function(d) { return x(d[1]); })
-                    .attr("height", y.bandwidth() )
-                    .attr("fill", "#69b3a2")
-                    .append("title")
-                    .attr("text", (d) => d[1])
+                    .enter().append("rect")
+                        .attr("x", x(0) )
+                        .attr("y", function(d) { return y(d[0]); })
+                        .attr("width", function(d) { return x(d[1]); })
+                        .attr("height", y.bandwidth() )
+                        .attr("fill", "#69b3a2")
+                        .append("title")
+                        .text((d) => Math.round(d[1]))
 
 
             });
@@ -360,7 +359,7 @@
                     .range([0, widthAttendees])
                     .padding([0.2])
                 svg.append("g")
-                    .attr("transform", "translate(0," + (heightAttendees - 50) + ")")
+                    .attr("transform", "translate(0," + (heightAttendees - 80) + ")")
                     .call(d3.axisBottom(x).tickSizeOuter(0))
                     .selectAll("text")
                     .style("text-anchor", "start")
@@ -370,7 +369,7 @@
                 // Add Y axis
                 var y = d3.scaleSqrt()
                     .domain([0, 6600])
-                    .range([ heightAttendees-50, 0 ]);
+                    .range([ heightAttendees - 80, 0 ]);
                 svg.append("g")
                     .call(d3.axisLeft(y));
 
@@ -402,6 +401,25 @@
                         .attr("width",x.bandwidth())
                         .append("title")
                         .text((d) => d[1]-d[0]);
+
+                svg.append("g")
+                    .append("text")
+                    .text("Nombre de participants par pays à la conférence CHI (2016-2019)")
+                    .attr("x", 200)
+                    .attr("y", 65)
+                    .attr("font-size", 20)
+                    .attr("text-decoration", "underline");
+
+                svg.append("circle").attr("cx",1100).attr("cy",60).attr("r", 6).style("fill", "skyblue")
+                svg.append("text").attr("x", 1110).attr("y", 65).text("2016").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",80).attr("r", 6).style("fill", "orange")
+                svg.append("text").attr("x", 1110).attr("y", 85).text("2017").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",100).attr("r", 6).style("fill", "lightgray")
+                svg.append("text").attr("x", 1110).attr("y", 105).text("2018").style("font-size", "15px").attr("alignment-baseline","middle")
+                svg.append("circle").attr("cx",1100).attr("cy",120).attr("r", 6).style("fill", "lightgreen")
+                svg.append("text").attr("x", 1110).attr("y", 125).text("2019").style("font-size", "15px").attr("alignment-baseline","middle")
+                
+                
             });
         </script>
         
