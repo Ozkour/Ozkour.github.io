@@ -1,4 +1,5 @@
 import csv
+from collections import Counter
 import math
 
 data2016 = list()
@@ -29,12 +30,12 @@ for data in datas:
     if data not in counts:
         counts[data] = {2016: data2016.count(data), 2017: data2017.count(data), 2018: data2018.count(data), 2019: data2019.count(data)}
 
-with open('chi-countries-counts.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile, delimiter=',')
-    writer.writerow(['Country', 'y2016', 'y2017', 'y2018', 'y2019' ])
-    for data in counts:
-        writer.writerow([data, counts[data][2016], counts[data][2017], counts[data][2018], counts[data][2019]])
-
+# with open('chi-countries-counts.csv', 'w', newline='') as csvfile:
+#     writer = csv.writer(csvfile, delimiter=',')
+#     writer.writerow(['Country', 'y2016', 'y2017', 'y2018', 'y2019' ])
+#     for data in counts:
+#         writer.writerow([data, counts[data][2016], counts[data][2017], counts[data][2018], counts[data][2019]])
+print(Counter(data2019))
 # for data in data2019[2:]:
 #     if data not in dicEU:
 #         dicEU[data] = data2019.count(data)
