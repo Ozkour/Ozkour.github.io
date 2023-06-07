@@ -12,7 +12,9 @@
           </style>
         <script src="https://d3js.org/d3.v4.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3-scale-radial.js"></script>
-        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+        <script src="../scripts/get_flight.js"></script>
+
     </head>
     <body>
         <div id="inf50"></div>
@@ -23,7 +25,19 @@
         </div>
 
         <script>
+            const attendees2019 = [{country : 'United States', count : 1163},{country : 'United Kingdom', count : 715},{country : 'Germany', count : 336},{country : 'Canada', count : 172}, 
+               {country : 'Korea, Republic of', count : 137},{country : 'Japan', count : 136},{country : 'China', count : 93},{country : 'Netherlands', count : 83},{country : 'France', count : 78}, 
+               {country : 'Denmark', count : 75},{country : 'Australia', count : 66},{country : 'Sweden', count : 58},{country : 'Austria', count : 54},{country : 'Switzerland', count : 51},{country : 'Taiwan', count : 38}, 
+               {country : 'Finland', count : 37},{country : 'Portugal', count : 34},{country : 'Italy', count : 28},{country : 'Belgium', count : 27},{country : 'Ireland', count : 26},{country : 'Israel', count : 25}, 
+               {country : 'India', count : 24},{country : 'Singapore', count : 20},{country : 'Spain', count : 18},{country : 'Hong Kong', count : 15},{country : 'Norway', count : 14},{country : 'Brazil', count : 12}, 
+               {country : 'Poland', count : 11},{country : 'New Zealand', count : 10},{country : 'Greece', count : 8},{country : 'United Arab Emirates', count : 7},{country : 'Czech Republic', count : 6}, 
+               {country : 'Russia', count : 6},{country : 'Bangladesh', count : 5},{country : 'Malaysia', count : 5},{country : 'Turkey', count : 5},{country : 'Cyprus', count : 4},{country : 'Luxembourg', count : 4}, 
+               {country : 'Pakistan', count : 4},{country : 'Ukraine', count : 4},{country : 'Qatar', count : 3},{country : 'Romania', count : 3},{country : 'Slovenia', count : 3},{country : 'Hungary', count : 3},{country : 'Namibia', count : 2}, 
+               {country : 'Nigeria', count : 2},{country : 'Saudi Arabia', count : 2},{country : 'Malta', count : 2},{country : 'Mexico', count : 2},{country : 'Argentina', count : 2},{country : 'Indonesia', count : 2}, 
+               {country : 'Egypt', count : 1},{country : 'Gabon', count : 1},{country : 'Jordan', count : 1},{country : 'Macao', count : 1},{country : 'South Africa', count : 1},{country : 'Colombia', count : 1},{country : 'Kuwait', count : 1}, 
+               {country : 'Ecuador', count : 1},{country : 'Iceland', count : 1},{country : 'Kenya', count : 1},{country : 'Uruguay', count : 1},{country : 'Estonia', count : 1}];
             var continents;
+
             
             function pushDataIfNotEmpty(d, origins){
                 if(d != ""){
@@ -858,9 +872,23 @@
                 svg5.append("circle").attr("cx",1100).attr("cy",120).attr("r", 6).style("fill", "lightgreen")
                 svg5.append("text").attr("x", 1110).attr("y", 125).text("2019").style("font-size", "15px").attr("alignment-baseline","middle")
                 
-
-
             });
+
+            d3.csv('../busiest_airports.csv', function(data){
+                const arrival_iata = "GLA";
+                const airports = new Map();
+                data.forEach(d => {
+                    airports.set(d.country, d.iata);
+                });
+                attendees2019.forEach(attendee => {
+                    if(attendee.count >= 10){
+                        var iata = airports.get(attendee.country);
+                        
+                    }
+                    
+                });
+            });
+            getAirports(1, 2);
         </script>
      
 
