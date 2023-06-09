@@ -12,18 +12,23 @@
 //qui va donner la liste des escales
 
 async function getAirports(origin, destination) {
-    var settings = {
-        "url": "https://partners.api.skyscanner.net/apiservices/v3/flights/live/search/create",
-        "method": "POST",
-        "timeout": 0,
-        "headers": {
-          "x-api-key": "prtl6749387986743898559646983194",
-          "Content-Type": "text/plain"
-        },
-        "data": "{\r\n  \"query\": {\r\n    \"market\": \"FR\",\r\n    \"locale\": \"fr-FR\",\r\n    \"currency\": \"EUR\",\r\n    \"queryLegs\": [\r\n      {\r\n        \"originPlaceId\": {\r\n            \"iata\": \"DEL\"\r\n          \r\n        },\r\n        \"destinationPlaceId\": {\r\n            \"iata\": \"GLA\"\r\n          \r\n        },\r\n        \"date\": {\r\n\r\n            \"year\": 2023,\r\n            \"month\": 9,\r\n            \"day\": 1\r\n\r\n}\r\n      }\r\n    ],\r\n    \"adults\": 1,\r\n    \"cabinClass\": \"CABIN_CLASS_ECONOMY\"\r\n  }\r\n}",
-    };
-    
-    $.ajax(settings).done(function (response) {
-    console.log(response);
-    });
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer ANkJGSXwXHrfyO4Uru3KNHRbm11S");
+    myHeaders.append("accept", "application/vnd.amadeus+json");
+    // myHeaders.append("Access-Control-Allow-Origin", "http://127.0.0.1:3000")
+
+    // // var raw = "{\r\n  \"query\": {\r\n    \"market\": \"FR\",\r\n    \"locale\": \"fr-FR\",\r\n    \"currency\": \"EUR\",\r\n    \"queryLegs\": [\r\n      {\r\n        \"originPlaceId\": {\r\n            \"iata\": \"DEL\"\r\n          \r\n        },\r\n        \"destinationPlaceId\": {\r\n            \"iata\": \"GLA\"\r\n          \r\n        },\r\n        \"date\": {\r\n\r\n            \"year\": 2023,\r\n            \"month\": 9,\r\n            \"day\": 1\r\n\r\n}\r\n      }\r\n    ],\r\n    \"adults\": 1,\r\n    \"cabinClass\": \"CABIN_CLASS_ECONOMY\"\r\n  }\r\n}";
+
+    // var requestOptions = {
+    // method: 'GET',
+    // headers: myHeaders
+    // };
+
+    // fetch("https://www.flightconnections.com/airports_url.php?lang=en&iata=cdg", requestOptions)
+    // .then(response => response.text())
+    // .then(result => console.log(result))
+    // .catch(error => console.log('error', error));
+    const response = await fetch("https://test.api.amadeus.com/v2/shopping/flight-offers?originLocationCode=DEL&destinationLocationCode=GLA&departureDate=2023-05-02&adults=1&nonStop=true&max=250");
+    const jsonData = await response.json();
+    console.log(jsonData);
 }

@@ -1,0 +1,22 @@
+<h1><strong>Estimate the carbon footprint of your next conference.</strong></h1>
+<hr>
+<form>
+    <div *ngIf="toLocationTemplate">
+        <label for=""><h3>Add an organization place :</h3></label>
+        <p *ngIf="destinations.length >0"><b>Selected cities :</b></p>
+        <div class="cities" *ngFor="let Location of destinations" (click)="handleOrigin(Location)">
+            <div class="city">{{ Location.name }} ({{ Location.country}})
+                <div class="delete" (click)="deleteCity(Location)">X</div>
+            </div>
+          </div>
+        <input type="text" class="form-control" name="from" [(ngModel)]="from"     (keypress)="handleFromLocation()">
+        <small>City search E.g. London</small>
+        <div class="card mb-3 mt-3" *ngFor="let Location of fromLocation" (click)="handleOrigin(Location)">
+            <div class="card-header"><b>Name:</b> {{ Location.name }}</div>
+            <div class="card-body">
+                Country Code: {{ Location.country}}
+            </div>
+          </div>
+          <button class="btn btn-secondary" (click)="findAirports()" [ngStyle]="{'width': '100%'}">Find Flights</button>
+    </div>
+</form>

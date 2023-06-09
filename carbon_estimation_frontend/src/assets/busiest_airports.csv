@@ -1,0 +1,195 @@
+country,code,iata
+Turkey,TR,IST
+United Kingdom,UK,LHR
+France,FR,CDG
+Netherlands,NL,AMS
+Spain,ES,MAD
+Germany,DE,FRA
+Italy,IT,FCO
+Russia,RU,SVO
+Portugal,PT,LIS
+Ireland,IE,DUB
+Austria,AT,VIE
+Greece,GR,ATH
+Switzerland,CH,ZRH
+Norway,NO,OSL
+Denmark,DK,CPH
+Belgium,BE,BRU
+Sweden,SE,ARN
+Poland,PL,WAW
+Finland,FI,HEL
+Romania,RO,OTP
+Hungary,HU,BUD
+Czech Republic,CZ,PRG
+Iceland,IS,KEF
+Bulgaria,BG,SOF
+Malta,MT,MLA
+Serbia,RS,BEG
+Latvia,LV,RIX
+Albania,AL,TIA
+Luxembourg,LU,LUX
+Lithuania,LT,VNO
+Mexico,MX,MEX
+Brazil,BR,GRU
+Colombia,CO,BOG
+Chile,CL,SCL
+Peru,PE,LIM
+Panama,PA,PTY
+Argentina,AR,AEP
+Puerto Rico,PR,SJU
+Dominican Republic,DO,PUJ
+Ecuador,EC,UIO
+Venezuela,VE,CCS
+Afghanistan,AF,KBL
+Algeria,DZ,ALG
+Andorra,AD,
+Angola,AO,
+Antigua and Barbuda,AG,
+Armenia,AM,
+Australia,AU,SYD
+Azerbaijan,AZ,
+Bahamas,BS,
+Bahrain,BH,
+Bangladesh,BD,
+Barbados,BB,
+Belarus,BY,
+Belize,BZ,
+Benin,BJ,
+Bhutan,BT,
+Bosnia and Herzegovina,BA,
+Botswana,BW,
+Brunei Darussalam,BN,
+Burkina Faso,BF,
+Burundi,BI,
+Cabo Verde,CV,
+Cambodia,KH,
+Cameroon,CM,
+Canada,CA,YYC YVR
+Central African Republic,CF,
+Chad,TD,
+China,CN,CAN CKG SZX
+Comoros,KM,
+Congo,CG,
+Costa Rica,CR,
+Côte d'Ivoire,CI,
+Croatia,HR,
+Cuba,CU,
+Cyprus,CY,
+"Korea, Republic of",KR,ICN
+Democratic Republic of the Congo,CD,
+Djinouti,DJ,
+Dominica,DM,
+Egypt,EG,CAI
+El Salvador,SV,
+Equatorial Guinea,GQ,
+Eritrea,ER,
+Estonia,EE,
+Eswatini,SZ,
+Ethiopia,ET,ADD
+Fiji,FJ,
+Gabon,,
+Gambia,,
+Georgia,,
+Ghana,,
+Grenada,,
+Guatemala,,
+Guinea,,
+Guinea-Bissau,,
+Guyana,,
+Haiti,,
+Honduras,,
+India,IN,DEL
+Indonesia,ID,CGK
+Islamic Republic of Iran,,
+Iraq,,
+Israel,IL,TLV
+Jamaica,,
+Japan,JP,HND
+Jordan,,
+Kazakhstan,,
+Kenya,KE,NBO
+Kiribati,,
+Kuwait,,
+Kyrgystan,,
+Laos,,
+Lebanon,,
+Lesotho,,
+Liberia,,
+Libya,,
+Liechtenstein,,
+Madagascar,,
+Malawi,,
+Malaysia,,
+Maldives,,
+Mali,,
+Marshall Islands,,
+Mauritania,,
+Mauritius,,
+Federated States of Micronesia,,
+Monaco,,
+Mongolia,,
+Montenegro,,
+Morocco,MA,CMN
+Mozambique,,
+Myanmar,,
+Namibia,,
+Nauru,,
+Nepal,,
+New Zealand,NZ,AKL
+Nicaragua,NI,LOS
+Niger,,
+Nigeria,,
+Norh Macedonia,,
+Oman,,
+Pakistan,,
+Palau,,
+Papua New Guinea,,
+Paraguay,,
+Philippines,PH,MNL
+Qatar,QA,DOH
+Moldova,,
+Rwanda,,
+Saint Kitts and Nevis,,
+Saing Lucia,,
+Saint Vincent and the Grenadines,,
+Samoa,,
+San MArino,,
+São Tomé and Príncipe,,
+Saudi Arabia,,
+Senegal,,
+Serbia,,
+Seychelles,SC,
+Sierra Leone,SL,
+Singapore,SG,SIN
+Slovakia,,
+Slovenia,,
+Solomon Islands,SB,
+Somalia,,
+South Africa,ZA,JNB
+South Sudan,,
+Sri Lanka,,
+Sudan,,
+Suriname,,
+Syria,,
+Tajikistan,,
+Thailand,,
+Tmor-Leste,,
+Togo,,
+Tonga,,
+Trinidad and Tobago,,
+Tunisia,TN,TUN
+Turkmenistan,,
+Tuvalu,,
+Uganda,,
+United Arab Emirates,AE,DXB
+Tanzania,,
+United States,US,"ATL, LAX, ORD"
+Uruguay,,
+Uzbekistan,,
+Vanuatu,,
+Vietnam,,
+Yemen,,
+Zambia,,
+Zimbabwe,,
+Taiwan,TW,TSA
+Hong Kong,HK,HKG
