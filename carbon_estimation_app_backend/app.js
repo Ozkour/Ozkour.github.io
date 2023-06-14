@@ -72,6 +72,43 @@ app.get(`/flight-search-nonstop`, (req, res) => {
     });
 });
 
+app.get(`/flights-search`, (req, res) => {
+    const originCode = req.query.originCode;
+    const destinationCode = req.query.destinationCode;
+    const dateOfDeparture = req.query.dateOfDeparture;
+    console.log(req.query);
+    // Find the cheapest flights
+    amadeus.shopping.flightOffersSearch.get({
+        originLocationCode: originCode,
+        destinationLocationCode: destinationCode,
+        departureDate: dateOfDeparture,
+        adults: '1',
+        max: '20',
+        nonStop: 'true'
+    }).then(function (response) {
+        if(response.result.data.length == 0){
+            amadeus.shopping.flightOffersSearch.get({
+                originLocationCode: originCode,
+                destinationLocationCode: destinationCode,
+                departureDate: dateOfDeparture,
+                adults: '1',
+                max: '20',
+                nonStop: 'false'
+            }).then(function (response) {
+                res.send(response.result);
+            })
+            .catch(function (response) {
+                res.send(response);
+            });
+        }
+        else{
+            res.send(response.result);
+        }
+    }).catch(function (response) {
+        res.send(response);
+    });
+});
+
 app.get(`/flight-connections-search-airport/:parameter`, (req, res) => {
     const name = req.params.parameter;
     const url = 'https://www.flightconnections.com/airports_url.php?lang=en&iata=' + name;

@@ -34,6 +34,25 @@ constructor() {
       this.defaultData2019.push([d['Country'],d['y2019']]);
     });
   });
+
+  d3.csv('../assets/busiest_airports.csv').then((data) => {
+    data.forEach(d => {
+      if(d['code'] != ""){
+        this.airports.set(d['code'], d['iata']);
+        this.airports.set(d['country'], d['iata']);
+      }
+    });
+  });
+
+  d3.csv('../assets/airports.csv').then(dataAirport => {
+    var cpt = 0;
+    dataAirport.forEach(d => {
+      if(d['iata'] != "\\N"){
+        this.airportsLoc.set(d['iata'], new Map([['lat',d['lat']],['long',d['long']]]))
+      }
+    });
+    
+  });
   
   // var itin: any = [[["SYD","HKG"],["HKG","CDG"]], [["SYD","HND"],["HND","CDG"]], [["SYD","DOH"],["DOH","DMK"]], [["SYD","SIN"],["SIN","HEL"],["HEL","CDG"]]];
   // this.itineraries.push(new Map([['origin', "SYD"],['dest', "CDG"],['flights',itin]]));
@@ -92,150 +111,188 @@ constructor() {
     this.destinations.splice(this.destinations.indexOf(location),1);
   }
 
-  async findAirports(){
+  findAirports2(){
     console.log("Loading...");
-      d3.csv('../assets/busiest_airports.csv').then((data) => {
-        // const airports = new Map();
-        data.forEach(d => {
-          if(d['code'] != ""){
-            this.airports.set(d['code'], d['iata']);
-            this.airports.set(d['country'], d['iata']);
-          }
-        });
-      });
-      
-      await this.defaultData2019.forEach((dataOrigin: any) =>{
-        if(this.data2019.get(dataOrigin[0]) != "0"){
-          var origin = this.airports.get(dataOrigin[0]);
-          this.destinations.forEach(async (dataDest: { country: any; }) => {
-            var dest = this.airports.get(dataDest.country);
-            if(origin != dest){
-              this.addAirport(origin);
-              this.addAirport(dest);
-              const response = await (await fetch(`http://localhost:5000/flight-connections-search-flights?origin=${origin}&dest=${dest}`)).json();
-                if(Object.keys(response).length == 0){
-                  this.itineraries.push(new Map([['origin', origin],['dest', dest],['stopovers',null]]));
-                }
-                else{
-                  var stopovers: any[] = [];
-                  Object.values(response).forEach((value: any) => {
-                    stopovers.push(value[1]);
-                    this.addAirport(value[1]);
-                    console.log("?????")
-                  });
-                  this.itineraries.push(new Map([['origin', origin],['dest', dest],['stopovers',stopovers]]));
-                }
-                console.log("zzfg")
-            }
-          });
-        }
-      });
-      d3.csv('../assets/airports.csv').then(dataAirport => {
-        console.log("coucou")
-        console.log(this.itineraries)
-        dataAirport.forEach(d => {
-          if(d['iata'] != "\N"){
-            this.airportsLoc.set(d['iata'], new Map([['lat',d['lat']],['long',d['long']]]))
-          }
-        });
-        
-      });
-      
+    this.fetchFlight2(this.defaultData2019, this.destinations);
+    this.itineraries.forEach((itin: any) => {
+      console.log(itin);
+    })
+
   }
 
+  async fetchFlight2(originData: any, destinationData: any, originIndex = 0, destIndex = 0){
+    var currentOrigin = originData[originIndex];
+    var currentDest = destinationData[destIndex];
+    var origin = this.airports.get(currentOrigin[0]);
+    var dest = this.airports.get(currentDest.country);
+    if(this.data2019.get(currentOrigin[0]) != "0" && origin != dest){
+      await fetch(`http://localhost:5000/flights-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
+        .then(response => response.json())
+        .then(data => {
+          this.listItineraries(data.data, dest, origin);
+          setTimeout(() =>{this.nextFetch(originData, destinationData, originIndex, destIndex)},2000);
+        });
+    }
+    else{
+      this.nextFetch(originData, destinationData, originIndex, destIndex);
+    }
+  }
 
+  nextFetch(originData: any, destinationData: any, originIndex: number, destIndex: number){
+    if(destIndex < destinationData.length - 1){
+      this.fetchFlight2(originData, destinationData, originIndex, destIndex+1);
+    }
+    else{
+      if(originIndex < originData.length -1){
+        this.fetchFlight2(originData, destinationData, originIndex+1, 0);
+      }
+    }
+  }
 
-  // findAirports(){
+  // async findAirports(){
   //   console.log("Loading...");
-  //   d3.csv('../assets/busiest_airports.csv').then((data) => {
-  //     const airports = new Map();
-  //     data.forEach(d => {
-  //       if(d['code'] != ""){
-  //         airports.set(d['code'], d['iata']);
-  //         airports.set(d['country'], d['iata']);
-  //       }
-  //     });
-  //     this.defaultData2019.forEach((dataOrigin: any) =>{
-  //       var origin = airports.get(dataOrigin[0]);
-  //       this.destinations.forEach((dataDest: { country: any; }) => {
-  //         var dest = airports.get(dataDest.country);
-  //         if(this.data2019.get(dataOrigin[0]) != "0" && origin != dest){
-  //           setTimeout(() => {
-  //             //this.fetchFlight(origin, dest);
-  //           }, 1500);
+  //     d3.csv('../assets/busiest_airports.csv').then((data) => {
+  //       // const airports = new Map();
+  //       data.forEach(d => {
+  //         if(d['code'] != ""){
+  //           this.airports.set(d['code'], d['iata']);
+  //           this.airports.set(d['country'], d['iata']);
   //         }
   //       });
   //     });
       
-  //   });
-  //   d3.csv('../assets/airports.csv').then(data => {
-  //     data.forEach(d => {
-  //       if(this.itinAirports.includes(d['iata'])){
-  //         this.airports.set(d['iata'], new Map([['lat',d['lat']],['long',d['long']]]))
+  //     await this.defaultData2019.forEach((dataOrigin: any) =>{
+  //       if(this.data2019.get(dataOrigin[0]) != "0"){
+  //         var origin = this.airports.get(dataOrigin[0]);
+  //         this.destinations.forEach(async (dataDest: { country: any; }) => {
+  //           var dest = this.airports.get(dataDest.country);
+  //           if(origin != dest){
+  //             this.addAirport(origin);
+  //             this.addAirport(dest);
+  //             const response = await (await fetch(`http://localhost:5000/flight-connections-search-flights?origin=${origin}&dest=${dest}`)).json();
+  //               if(Object.keys(response).length == 0){
+  //                 this.itineraries.push(new Map([['origin', origin],['dest', dest],['stopovers',null]]));
+  //               }
+  //               else{
+  //                 var stopovers: any[] = [];
+  //                 Object.values(response).forEach((value: any) => {
+  //                   stopovers.push(value[1]);
+  //                   this.addAirport(value[1]);
+  //                   console.log("?????")
+  //                 });
+  //                 this.itineraries.push(new Map([['origin', origin],['dest', dest],['stopovers',stopovers]]));
+  //               }
+  //               console.log("zzfg")
+  //           }
+  //         });
   //       }
   //     });
-  //     console.log(this.airports)
-  //   });
+  //     
+      
   // }
 
-  // fetchFlight(origin: any, dest: any, noStop = false){
-  //   if(noStop){
-  //     fetch(`http://localhost:5000/flight-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       this.listItineraries(data.data, dest, origin);
-  //     });
-  //   }
-  //   else{
-  //     fetch(`http://localhost:5000/flight-search-nonstop?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
-  //       .then(response => response.json())
-  //       .then(data => {
-  //         if(!data.data){
-  //           console.log(origin, dest)
-  //           console.log(data);
-  //         }
-  //         else{
-  //           if(data.data.length == 0){
-  //             console.log("there is no flight without a stop here are the stops :");
-  //             setTimeout(() => {
-  //               this.fetchFlight(origin, dest, true);
-  //             }, 1500);
-  //           }
-  //           else{
-  //             this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',[[[origin, dest]]]]]));
-  //             this.addAirport(origin,dest);
-  //             console.log(this.itineraries);
-  //           }
-  //         }
-  //       });
-  //   }
+
+
+  findAirports(){
+    console.log("Loading...");
+    d3.csv('../assets/busiest_airports.csv').then((data) => {
+      const airports = new Map();
+      data.forEach(d => {
+        if(d['code'] != ""){
+          airports.set(d['code'], d['iata']);
+          airports.set(d['country'], d['iata']);
+        }
+      });
+      this.defaultData2019.forEach((dataOrigin: any) =>{
+        var origin = airports.get(dataOrigin[0]);
+        this.destinations.forEach((dataDest: { country: any; }) => {
+          var dest = airports.get(dataDest.country);
+          if(this.data2019.get(dataOrigin[0]) != "0" && origin != dest){
+            setTimeout(() => {
+              this.fetchFlight(origin, dest);
+            }, 1500);
+          }
+        });
+      });
+      
+    });
+    d3.csv('../assets/airports.csv').then(data => {
+      data.forEach(d => {
+        if(this.itinAirports.includes(d['iata'])){
+          this.airports.set(d['iata'], new Map([['lat',d['lat']],['long',d['long']]]))
+        }
+      });
+      console.log(this.airports)
+    });
+  }
+
+  async fetchFlight(origin: any, dest: any, noStop = false){
+    if(noStop){
+      setTimeout(async () => {
+        await fetch(`http://localhost:5000/flight-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
+        .then(response => response.json())
+        .then(data => {
+          this.listItineraries(data.data, dest, origin);
+        });
+      }, 1500);
+      
+    }
+    else{
+      setTimeout(async () => {
+        await fetch(`http://localhost:5000/flight-search-nonstop?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
+        .then(response => response.json())
+        .then(data => {
+          if(!data.data){
+            console.log(origin, dest)
+            console.log(data);
+          }
+          else{
+            if(data.data.length == 0){
+              console.log("there is no flight without a stop here are the stops :");
+              setTimeout(() => {
+                this.fetchFlight(origin, dest, true);
+              }, 1500);
+            }
+            else{
+              this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',[[[origin, dest]]]]]));
+              this.addAirport(origin,dest);
+              console.log(this.itineraries);
+            }
+          }
+        });
+      }, 1500);
+      
+    }
     
-  // }
+  }
 
-  // listItineraries(flights: any = [], dest: any, origin: any){
-  //   var itin: any[][][] = [];
-  //   var step: any[][] = [];
-  //   flights.forEach((flight: { itineraries: { segments: any; }[]; }) =>{
-  //     (flight.itineraries[0].segments).forEach((seg: { departure: { iataCode: any; }; arrival: { iataCode: any; }; }) =>{
-  //       step.push([seg.departure.iataCode, seg.arrival.iataCode]);
-  //       this.addAirport(seg.departure.iataCode, seg.arrival.iataCode);
-  //     });
-  //     itin.push(step);
-  //     step = [];
+  listItineraries(flights: any = [], dest: any, origin: any){
+    var itin: any[][][] = [];
+    var step: any[][] = [];
+    flights.forEach((flight: { itineraries: { segments: any; }[]; }) =>{
+      (flight.itineraries[0].segments).forEach((seg: { departure: { iataCode: any; }; arrival: { iataCode: any; }; }) =>{
+        step.push([seg.departure.iataCode, seg.arrival.iataCode]);
+        this.addAirport(seg.departure.iataCode, seg.arrival.iataCode);
+      });
+      itin.push(step);
+      step = [];
       
-  //   });
-  //   this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',itin]]));
-  //   console.log(this.itineraries);
-  // }
+    });
+    this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',itin]]));
+    console.log(this.itineraries);
+  }
 
   changeVal(country: any, event: any){
     this.data2019.set(country,event.target.value);
   }
 
-  addAirport(airport: any){
+  addAirport(airport: any, airport2: any){
+    console.log("remplit")
     if(!this.itinAirports.includes(airport)){
-      console.log("remplit")
       this.itinAirports.push(airport);
+    }
+    if(!this.itinAirports.includes(airport2)){
+      this.itinAirports.push(airport2);
     }
   }
 
