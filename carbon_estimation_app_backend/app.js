@@ -19,19 +19,7 @@ app.listen(PORT, () =>
     console.log(`Server is running on port: http://localhost:${PORT}`)
 );
 
-// const request = require('request');
 
-// var name = 'San Francisco'
-// request.get({
-//   url: 'https://api.api-ninjas.com/v1/city?name=' + name,
-//   headers: {
-//     'X-Api-Key': 'YOUR_API_KEY'
-//   },
-// }, function(error, response, body) {
-//   if(error) return console.error('Request failed:', error);
-//   else if(response.statusCode != 200) return console.error('Error:', response.statusCode, body.toString('utf8'));
-//   else console.log(body)
-// });
 const config = {
     headers:{
         'X-Api-Key': '6zOd4Cia3qk2A0edQ1Utow==momXUz1Eu5Bv2X0h'
@@ -82,4 +70,48 @@ app.get(`/flight-search-nonstop`, (req, res) => {
     }).catch(function (response) {
         res.send(response);
     });
+});
+
+app.get(`/flight-connections-search-airport/:parameter`, (req, res) => {
+    const name = req.params.parameter;
+    const url = 'https://www.flightconnections.com/airports_url.php?lang=en&iata=' + name;
+    axios.get(url)
+    .then(response=> res.send(response.data))
+    .catch(err=> console.log(err))
+});
+
+app.get(`/flight-connections-search-flights`, (req, res) => {
+    const dep = req.query.origin;
+    const arr = req.query.dest;
+    var depID, arrID;
+    // GET FIRST ID
+    axios.get('https://www.flightconnections.com/airports_url.php?lang=en&iata=' + dep)
+    .then(response=> {
+        depID = (response.data).c;
+        // GET SECOND ID
+        axios.get('https://www.flightconnections.com/airports_url.php?lang=en&iata=' + arr)
+        .then(response=> {
+            arrID = response.data.c;
+            // GET ITINERARY WITHOUT STOPS
+            const url = 'https://www.flightconnections.com/ro'+depID+'_'+arrID+'.json?lang=en&f=no0&direction=from&exc=&ids=&cl=&flight_direction=from&flight_type=round'
+            axios.get(url)
+            .then(response=> {
+                if(response.data.data.length != 0){
+                    res.send(Object());
+                }
+                else{
+                    // GET ITINERARY WITH STOPS
+                    const url = 'https://www.flightconnections.com/ro235_3799_2_0_0.json?lang=en&f=no0&direction=from&exc=&ids=&cl=&flight_direction=from&flight_type=round'
+                    axios.get(url)
+                    .then(response=> {res.send(response.data.airports)})
+                    .catch(err=> console.log(err))
+                }
+            })
+            .catch(err=> console.log(err));
+        })
+        .catch(err=> console.log(err));
+    })
+    .catch(err=> console.log(err));
+    
+    
 });

@@ -1,6 +1,14 @@
 <h1><strong>Estimate the carbon footprint of your next conference.</strong></h1>
 <hr>
 <form>
+    <div *ngIf="fromLocationTemplate">
+        <div class="origins" *ngFor="let Origin of defaultData2019">
+            <p>{{ Origin[0] }}</p>
+            <input type="number" class="form-control" name="value" value="{{ Origin[1] }}" (input)="changeVal(Origin[0], $event)">
+        </div>
+        
+    </div>
+
     <div *ngIf="toLocationTemplate">
         <label for=""><h3>Add an organization place :</h3></label>
         <p *ngIf="destinations.length >0"><b>Selected cities :</b></p>
