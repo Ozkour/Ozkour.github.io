@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, resolveForwardRef } from '@angular/core';
 import * as d3 from 'd3';
 
 @Component({
@@ -27,6 +27,7 @@ data2019: any = new Map();
 defaultData2019: any = [];
 value = 0;
 airportsLoc: any = new Map();
+CO2est: any = new Map();
 constructor() { 
   d3.csv('../assets/chi-countries-counts-test.csv').then(data =>{
     data.forEach(d => {
@@ -113,14 +114,29 @@ constructor() {
 
   findAirports2(){
     console.log("Loading...");
-    this.fetchFlight2(this.defaultData2019, this.destinations);
-    this.itineraries.forEach((itin: any) => {
-      console.log(itin);
-    })
+    var bar = new Promise(resolve => {
+      this.fetchFlight2(this.defaultData2019, this.destinations, 0, 0, resolve);
+    });
+//faut faire la somme des segments pour chaque voyage et moyenne de chaque voyage pour chaque dest
+    bar.then(() => {
+      var estimation = 0, count = 0;
+      this.itineraries.forEach((itin: any) => {
+        itin.get('flights').forEach((travel: any) =>{
+          travel.forEach((seg: any) => {
+            //calculer estimation
+            //ajouter a une somme
+          });
+          //cpt++
+        });
+        //faire la moyenne des sommes (diviser par nombre de travel)
+        
+      })
+    });
+    
 
   }
 
-  async fetchFlight2(originData: any, destinationData: any, originIndex = 0, destIndex = 0){
+  async fetchFlight2(originData: any, destinationData: any, originIndex = 0, destIndex = 0, resolve: any){
     var currentOrigin = originData[originIndex];
     var currentDest = destinationData[destIndex];
     var origin = this.airports.get(currentOrigin[0]);
@@ -130,21 +146,24 @@ constructor() {
         .then(response => response.json())
         .then(data => {
           this.listItineraries(data.data, dest, origin);
-          setTimeout(() =>{this.nextFetch(originData, destinationData, originIndex, destIndex)},2000);
+          setTimeout(() =>{this.nextFetch(originData, destinationData, originIndex, destIndex, resolve)},2000);
         });
     }
     else{
-      this.nextFetch(originData, destinationData, originIndex, destIndex);
+      this.nextFetch(originData, destinationData, originIndex, destIndex, resolve);
     }
   }
 
-  nextFetch(originData: any, destinationData: any, originIndex: number, destIndex: number){
+  nextFetch(originData: any, destinationData: any, originIndex: number, destIndex: number, resolve: any){
     if(destIndex < destinationData.length - 1){
-      this.fetchFlight2(originData, destinationData, originIndex, destIndex+1);
+      this.fetchFlight2(originData, destinationData, originIndex, destIndex+1, resolve);
     }
     else{
       if(originIndex < originData.length -1){
-        this.fetchFlight2(originData, destinationData, originIndex+1, 0);
+        this.fetchFlight2(originData, destinationData, originIndex+1, 0, resolve);
+      }
+      else{
+        resolve();
       }
     }
   }
@@ -279,7 +298,6 @@ constructor() {
       
     });
     this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',itin]]));
-    console.log(this.itineraries);
   }
 
   changeVal(country: any, event: any){
@@ -287,7 +305,6 @@ constructor() {
   }
 
   addAirport(airport: any, airport2: any){
-    console.log("remplit")
     if(!this.itinAirports.includes(airport)){
       this.itinAirports.push(airport);
     }
