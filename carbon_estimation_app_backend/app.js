@@ -3,7 +3,8 @@ import bodyParser from 'body-parser'
 import cors from "cors";
 import Amadeus from 'amadeus';
 import axios from 'axios';
-require('dotenv').config()
+import 'dotenv/config';
+
 
 const amadeus = new Amadeus({
     clientId: process.env.API_ID,
