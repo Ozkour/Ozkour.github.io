@@ -41,6 +41,7 @@ constructor() {
       if(d['code'] != ""){
         this.airports.set(d['code'], d['iata']);
         this.airports.set(d['country'], d['iata']);
+        this.airports.set(d['iata'], d['country']);
       }
     });
   });
@@ -74,26 +75,7 @@ constructor() {
 }
   ngOnInit(): void {
   }
-  onFindFlight() {
-      if (this.date == "") {
-        alert("Please choose a date")
-      } else {
-        fetch(`http://localhost:5000/flight-search?originCode=${this.origins.iataCode}&destinationCode=${this.destinations.iataCode}&dateOfDeparture=${this.date}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-       })
-      .then(response => response.json())
-      .then(data => {
-        this.departureDateTemplate = false
-        this.flightTemplate = true
-      })
-      .catch((error) => {
-        alert(error)
-      });
-      }
-  }
+
   handleFromLocation() {
     if (this.from.length > 3) {
       fetch(`http://localhost:5000/city-search/${this.from}`)
@@ -119,18 +101,34 @@ constructor() {
     });
 //faut faire la somme des segments pour chaque voyage et moyenne de chaque voyage pour chaque dest
     bar.then(() => {
-      var estimation = 0, count = 0;
+      var sum = 0;
       this.itineraries.forEach((itin: any) => {
-        itin.get('flights').forEach((travel: any) =>{
+        var origin = itin.get('origin');
+        var dest = itin.get('dest');
+        var flights = itin.get('flights');
+        flights.forEach((travel: any) =>{
           travel.forEach((seg: any) => {
+            var airportOrigin = this.airportsLoc.get(seg[0]);
+            var airportDest = this.airportsLoc.get(seg[1]);
+            var latOrigin = airportOrigin.get('lat');
+            var longOrigin = airportOrigin.get('long');
+            var latDest = airportDest.get('lat');
+            var longDest = airportDest.get('long');
+            sum += 1
+            // sum += (latOrigin+longOrigin)*(latDest+longDest)/2;
             //calculer estimation
             //ajouter a une somme
           });
           //cpt++
         });
+        var estimation = sum / flights.length * this.data2019.get(this.airports.get(origin));
+        this.CO2est.has(dest) ? this.CO2est.set(dest, this.CO2est.get(dest) + estimation) : this.CO2est.set(dest, estimation);
+        sum = 0;
         //faire la moyenne des sommes (diviser par nombre de travel)
         
-      })
+      });
+      console.log(this.itineraries);
+      console.log("ici", this.CO2est);
     });
     
 
