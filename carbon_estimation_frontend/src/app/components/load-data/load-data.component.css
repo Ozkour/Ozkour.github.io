@@ -1,0 +1,32 @@
+.cities{
+    display: flex;
+}
+
+.city{
+    display: flex;
+    margin: 5px;
+    border: 2px solid lightgray;
+    border-radius: 8px;
+    padding: 5px;
+}
+
+.delete{
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.card{
+    display: flex;
+    flex-direction: row;
+}
+
+.card-header{
+    width: 100%;
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    cursor: pointer;
+}
+
+.card-body{
+    text-align: center;
+}

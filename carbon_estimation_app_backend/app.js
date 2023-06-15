@@ -3,10 +3,11 @@ import bodyParser from 'body-parser'
 import cors from "cors";
 import Amadeus from 'amadeus';
 import axios from 'axios';
+require('dotenv').config()
 
 const amadeus = new Amadeus({
-    clientId: 'oRIGGVBKwA5QFAtH34Bo7H3GX95HqSRZ',
-    clientSecret: 'TJrs6f8MIf2yjE9N',
+    clientId: process.env.API_ID,
+    clientSecret: process.env.API_SECRET,
 });
 
 const app = express();
@@ -22,7 +23,7 @@ app.listen(PORT, () =>
 
 const config = {
     headers:{
-        'X-Api-Key': '6zOd4Cia3qk2A0edQ1Utow==momXUz1Eu5Bv2X0h'
+        'X-Api-Key': process.env.API_KEY
     }
   };
 

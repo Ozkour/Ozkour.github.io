@@ -118,8 +118,16 @@ constructor() {
       await fetch(`http://localhost:5000/flights-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
         .then(response => response.json())
         .then(data => {
-          this.addItineraries(data.data, dest, origin);
-          setTimeout(() =>{this.nextFetch(originData, destinationData, originIndex, destIndex, resolve)},2000);
+          if(data.data){
+            this.addItineraries(data.data, dest, origin);
+            setTimeout(() =>{this.nextFetch(originData, destinationData, originIndex, destIndex, resolve)},2000);
+          }
+          else{
+            console.log("ERROR, start again");
+            console.log(data);
+            this.fetchFlight(originData, destinationData, originIndex, destIndex, resolve);
+          }
+          
         });
     }
     else{
@@ -137,6 +145,7 @@ constructor() {
         this.fetchFlight(originData, destinationData, originIndex+1, 0, resolve);
       }
       else{
+        console.log("DONE")
         resolve();
       }
     }
