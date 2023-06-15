@@ -7,32 +7,25 @@ import * as d3 from 'd3';
   styleUrls: ['./load-data.component.css']
 })
 export class LoadDataComponent implements OnInit {
-airports: any = new Map();
-itinAirports: any = [];
-from: any = "";
-fromLocation: any = [];
-origins: any = [];
+
+airports: Map<string, string> | any = new Map();
+to: string = "";
 toLocationTemplate: boolean = true;
 fromLocationTemplate: boolean = true;
-inputData: boolean = true;
-to: any = "";
-destinations: any = [];
-toLocation: any = [];
+destinations: any[] = [];
+toLocation: any[] = [];
 departureDateTemplate: boolean = false
-date: any = "";
-flights: any;
-flightTemplate: boolean = false;
-itineraries: any = [];
-data2019: any = new Map();
-defaultData2019: any = [];
-value = 0;
-airportsLoc: any = new Map();
-CO2est: any = new Map();
+itineraries: Map<string, any>[] = [];
+origins: Map<string, string> | any = new Map();
+defaultOrigins: string[][] = [];
+airportsLoc: Map<string, Map<string, string>> = new Map();
+CO2est: Map<string, number> | any = new Map();
+
 constructor() { 
   d3.csv('../assets/chi-countries-counts-test.csv').then(data =>{
-    data.forEach(d => {
-      this.data2019.set(d['Country'], d['y2019']);
-      this.defaultData2019.push([d['Country'],d['y2019']]);
+    data.forEach((d: any) => {
+      this.origins.set(d['Country'], d['y2019']);
+      this.defaultOrigins.push([d['Country'],d['y2019']]);
     });
   });
 
@@ -48,102 +41,84 @@ constructor() {
 
   d3.csv('../assets/airports.csv').then(dataAirport => {
     var cpt = 0;
-    dataAirport.forEach(d => {
+    dataAirport.forEach((d: any) => {
       if(d['iata'] != "\\N"){
         this.airportsLoc.set(d['iata'], new Map([['lat',d['lat']],['long',d['long']]]))
       }
     });
     
   });
-  
-  // var itin: any = [[["SYD","HKG"],["HKG","CDG"]], [["SYD","HND"],["HND","CDG"]], [["SYD","DOH"],["DOH","DMK"]], [["SYD","SIN"],["SIN","HEL"],["HEL","CDG"]]];
-  // this.itineraries.push(new Map([['origin', "SYD"],['dest', "CDG"],['flights',itin]]));
-  // var itin: any = [[["SYD","BKK"]]];
-  // this.itineraries.push(new Map([['origin', "SYD"],['dest', "BKK"],['flights',itin]]));
-  // var itin: any = [[["CDG","LAX"]]];
-  // this.itineraries.push(new Map([['origin', "SYD"],['dest', "LAX"],['flights',itin]]));
-  // console.log(this.itineraries);
-  // this.itinAirports = ["SYD", "HKG", "CDG", "HND", "DOH", "DMK", "SIN", "HEL", "BKK", "LAX"]
-  // var name1 = "CDG"
-  // var id1, id2;
-  //  var name2 = "SYD"
-
-  //   fetch(`http://localhost:5000/flight-connections-search-flights?origin=${name1}&dest=${name2}`)
-  //   .then(response => response.json())
-  //   .then(data => console.log(data));
-  
 }
+
   ngOnInit(): void {
   }
 
-  handleFromLocation() {
-    if (this.from.length > 3) {
-      fetch(`http://localhost:5000/city-search/${this.from}`)
+  // API call to find cities
+  handleToLocation() {
+    if (this.to.length > 3) {
+      fetch(`http://localhost:5000/city-search/${this.to}`)
       .then(response => response.json())
-      .then(data => this.fromLocation = data)
+      .then(data => this.toLocation = data)
     }
   }
-  handleOrigin(location: any) {
-    this.destinations.push(location);
-    this.fromLocation = [];
-    this.from = "";
-  }
 
+  // Add city to destinations
+  handleDestination(location: any) {
+    this.destinations.push(location);
+    this.toLocation = [];
+    this.to = "";
+  }
 
   deleteCity(location: any){
     this.destinations.splice(this.destinations.indexOf(location),1);
   }
 
-  findAirports2(){
+  findAirports(){
     console.log("Loading...");
-    var bar = new Promise(resolve => {
-      this.fetchFlight2(this.defaultData2019, this.destinations, 0, 0, resolve);
+    // wait for fetches to be done and array to be filled 
+    var fetches = new Promise(resolve => {
+      this.fetchFlight(this.defaultOrigins, this.destinations, 0, 0, resolve);
     });
-//faut faire la somme des segments pour chaque voyage et moyenne de chaque voyage pour chaque dest
-    bar.then(() => {
+
+    //compute CO2 estimation
+    fetches.then(() => {
       var sum = 0;
-      this.itineraries.forEach((itin: any) => {
+      this.itineraries.forEach((itin: Map<string, any>) => { //for each origin-dest pair
         var origin = itin.get('origin');
         var dest = itin.get('dest');
         var flights = itin.get('flights');
-        flights.forEach((travel: any) =>{
-          travel.forEach((seg: any) => {
-            var airportOrigin = this.airportsLoc.get(seg[0]);
-            var airportDest = this.airportsLoc.get(seg[1]);
+        flights.forEach((route: string[][]) =>{ //for each route
+          route.forEach((stage: string[]) => { //for each stage
+            var airportOrigin: any = this.airportsLoc.get(stage[0]);
+            var airportDest: any = this.airportsLoc.get(stage[1]);
             var latOrigin = airportOrigin.get('lat');
             var longOrigin = airportOrigin.get('long');
             var latDest = airportDest.get('lat');
             var longDest = airportDest.get('long');
+            //carbon footprint is computed
             sum += 1
             // sum += (latOrigin+longOrigin)*(latDest+longDest)/2;
-            //calculer estimation
-            //ajouter a une somme
           });
-          //cpt++
         });
-        var estimation = sum / flights.length * this.data2019.get(this.airports.get(origin));
+        // mean of routes for each origin-dest pair multiplied by the number of attendees
+        var estimation = sum / flights.length * this.origins.get(this.airports.get(origin));
+        // add carbon footprint to destinations
         this.CO2est.has(dest) ? this.CO2est.set(dest, this.CO2est.get(dest) + estimation) : this.CO2est.set(dest, estimation);
-        sum = 0;
-        //faire la moyenne des sommes (diviser par nombre de travel)
-        
+        sum = 0;        
       });
-      console.log(this.itineraries);
-      console.log("ici", this.CO2est);
     });
-    
-
   }
 
-  async fetchFlight2(originData: any, destinationData: any, originIndex = 0, destIndex = 0, resolve: any){
+  async fetchFlight(originData: string[][], destinationData: any[], originIndex = 0, destIndex = 0, resolve: any){
     var currentOrigin = originData[originIndex];
     var currentDest = destinationData[destIndex];
     var origin = this.airports.get(currentOrigin[0]);
     var dest = this.airports.get(currentDest.country);
-    if(this.data2019.get(currentOrigin[0]) != "0" && origin != dest){
+    if(this.origins.get(currentOrigin[0]) != "0" && origin != dest){
       await fetch(`http://localhost:5000/flights-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
         .then(response => response.json())
         .then(data => {
-          this.listItineraries(data.data, dest, origin);
+          this.addItineraries(data.data, dest, origin);
           setTimeout(() =>{this.nextFetch(originData, destinationData, originIndex, destIndex, resolve)},2000);
         });
     }
@@ -152,13 +127,14 @@ constructor() {
     }
   }
 
-  nextFetch(originData: any, destinationData: any, originIndex: number, destIndex: number, resolve: any){
+  // prepare index to the next API call
+  nextFetch(originData: string[][], destinationData: any[], originIndex: number, destIndex: number, resolve: any){
     if(destIndex < destinationData.length - 1){
-      this.fetchFlight2(originData, destinationData, originIndex, destIndex+1, resolve);
+      this.fetchFlight(originData, destinationData, originIndex, destIndex+1, resolve);
     }
     else{
       if(originIndex < originData.length -1){
-        this.fetchFlight2(originData, destinationData, originIndex+1, 0, resolve);
+        this.fetchFlight(originData, destinationData, originIndex+1, 0, resolve);
       }
       else{
         resolve();
@@ -166,150 +142,25 @@ constructor() {
     }
   }
 
-  // async findAirports(){
-  //   console.log("Loading...");
-  //     d3.csv('../assets/busiest_airports.csv').then((data) => {
-  //       // const airports = new Map();
-  //       data.forEach(d => {
-  //         if(d['code'] != ""){
-  //           this.airports.set(d['code'], d['iata']);
-  //           this.airports.set(d['country'], d['iata']);
-  //         }
-  //       });
-  //     });
-      
-  //     await this.defaultData2019.forEach((dataOrigin: any) =>{
-  //       if(this.data2019.get(dataOrigin[0]) != "0"){
-  //         var origin = this.airports.get(dataOrigin[0]);
-  //         this.destinations.forEach(async (dataDest: { country: any; }) => {
-  //           var dest = this.airports.get(dataDest.country);
-  //           if(origin != dest){
-  //             this.addAirport(origin);
-  //             this.addAirport(dest);
-  //             const response = await (await fetch(`http://localhost:5000/flight-connections-search-flights?origin=${origin}&dest=${dest}`)).json();
-  //               if(Object.keys(response).length == 0){
-  //                 this.itineraries.push(new Map([['origin', origin],['dest', dest],['stopovers',null]]));
-  //               }
-  //               else{
-  //                 var stopovers: any[] = [];
-  //                 Object.values(response).forEach((value: any) => {
-  //                   stopovers.push(value[1]);
-  //                   this.addAirport(value[1]);
-  //                   console.log("?????")
-  //                 });
-  //                 this.itineraries.push(new Map([['origin', origin],['dest', dest],['stopovers',stopovers]]));
-  //               }
-  //               console.log("zzfg")
-  //           }
-  //         });
-  //       }
-  //     });
-  //     
-      
-  // }
 
-
-
-  findAirports(){
-    console.log("Loading...");
-    d3.csv('../assets/busiest_airports.csv').then((data) => {
-      const airports = new Map();
-      data.forEach(d => {
-        if(d['code'] != ""){
-          airports.set(d['code'], d['iata']);
-          airports.set(d['country'], d['iata']);
-        }
-      });
-      this.defaultData2019.forEach((dataOrigin: any) =>{
-        var origin = airports.get(dataOrigin[0]);
-        this.destinations.forEach((dataDest: { country: any; }) => {
-          var dest = airports.get(dataDest.country);
-          if(this.data2019.get(dataOrigin[0]) != "0" && origin != dest){
-            setTimeout(() => {
-              this.fetchFlight(origin, dest);
-            }, 1500);
-          }
-        });
-      });
-      
-    });
-    d3.csv('../assets/airports.csv').then(data => {
-      data.forEach(d => {
-        if(this.itinAirports.includes(d['iata'])){
-          this.airports.set(d['iata'], new Map([['lat',d['lat']],['long',d['long']]]))
-        }
-      });
-      console.log(this.airports)
-    });
-  }
-
-  async fetchFlight(origin: any, dest: any, noStop = false){
-    if(noStop){
-      setTimeout(async () => {
-        await fetch(`http://localhost:5000/flight-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
-        .then(response => response.json())
-        .then(data => {
-          this.listItineraries(data.data, dest, origin);
-        });
-      }, 1500);
-      
-    }
-    else{
-      setTimeout(async () => {
-        await fetch(`http://localhost:5000/flight-search-nonstop?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
-        .then(response => response.json())
-        .then(data => {
-          if(!data.data){
-            console.log(origin, dest)
-            console.log(data);
-          }
-          else{
-            if(data.data.length == 0){
-              console.log("there is no flight without a stop here are the stops :");
-              setTimeout(() => {
-                this.fetchFlight(origin, dest, true);
-              }, 1500);
-            }
-            else{
-              this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',[[[origin, dest]]]]]));
-              this.addAirport(origin,dest);
-              console.log(this.itineraries);
-            }
-          }
-        });
-      }, 1500);
-      
-    }
-    
-  }
-
-  listItineraries(flights: any = [], dest: any, origin: any){
-    var itin: any[][][] = [];
-    var step: any[][] = [];
+  addItineraries(flights: any, dest: any, origin: any){
+    var routes: string[][][] = [];
+    var stages: string[][] = [];
     flights.forEach((flight: { itineraries: { segments: any; }[]; }) =>{
       (flight.itineraries[0].segments).forEach((seg: { departure: { iataCode: any; }; arrival: { iataCode: any; }; }) =>{
-        step.push([seg.departure.iataCode, seg.arrival.iataCode]);
-        this.addAirport(seg.departure.iataCode, seg.arrival.iataCode);
+        stages.push([seg.departure.iataCode, seg.arrival.iataCode]);
       });
-      itin.push(step);
-      step = [];
+      routes.push(stages);
+      stages = [];
       
     });
-    this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',itin]]));
+    // all stages of route are added
+    this.itineraries.push(new Map([['origin', origin],['dest', dest],['flights',routes]]));
   }
 
+  // set number of attendees for a country
   changeVal(country: any, event: any){
-    this.data2019.set(country,event.target.value);
+    this.origins.set(country,event.target.value);
   }
-
-  addAirport(airport: any, airport2: any){
-    if(!this.itinAirports.includes(airport)){
-      this.itinAirports.push(airport);
-    }
-    if(!this.itinAirports.includes(airport2)){
-      this.itinAirports.push(airport2);
-    }
-  }
-
 
 }

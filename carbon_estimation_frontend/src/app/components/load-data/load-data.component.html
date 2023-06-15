@@ -2,7 +2,7 @@
 <hr>
 <form>
     <div *ngIf="fromLocationTemplate">
-        <div class="origins" *ngFor="let Origin of defaultData2019">
+        <div class="origins" *ngFor="let Origin of defaultOrigins">
             <p>{{ Origin[0] }}</p>
             <input type="number" class="form-control" name="value" value="{{ Origin[1] }}" (input)="changeVal(Origin[0], $event)">
         </div>
@@ -12,19 +12,19 @@
     <div *ngIf="toLocationTemplate">
         <label for=""><h3>Add an organization place :</h3></label>
         <p *ngIf="destinations.length >0"><b>Selected cities :</b></p>
-        <div class="cities" *ngFor="let Location of destinations" (click)="handleOrigin(Location)">
+        <div class="cities" *ngFor="let Location of destinations">
             <div class="city">{{ Location.name }} ({{ Location.country}})
                 <div class="delete" (click)="deleteCity(Location)">X</div>
             </div>
           </div>
-        <input type="text" class="form-control" name="from" [(ngModel)]="from"     (keypress)="handleFromLocation()">
+        <input type="text" class="form-control" name="to" [(ngModel)]="to"     (keypress)="handleToLocation()">
         <small>City search E.g. London</small>
-        <div class="card mb-3 mt-3" *ngFor="let Location of fromLocation" (click)="handleOrigin(Location)">
+        <div class="card mb-3 mt-3" *ngFor="let Location of toLocation" (click)="handleDestination(Location)">
             <div class="card-header"><b>Name:</b> {{ Location.name }}</div>
             <div class="card-body">
                 Country Code: {{ Location.country}}
             </div>
           </div>
-          <button class="btn btn-secondary" (click)="findAirports2()" [ngStyle]="{'width': '100%'}">Find Flights</button>
+          <button class="btn btn-secondary" (click)="findAirports()" [ngStyle]="{'width': '100%'}">Find Flights</button>
     </div>
 </form>

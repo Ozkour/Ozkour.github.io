@@ -76,7 +76,6 @@ app.get(`/flights-search`, (req, res) => {
     const originCode = req.query.originCode;
     const destinationCode = req.query.destinationCode;
     const dateOfDeparture = req.query.dateOfDeparture;
-    console.log(req.query);
     // Find the cheapest flights
     amadeus.shopping.flightOffersSearch.get({
         originLocationCode: originCode,
