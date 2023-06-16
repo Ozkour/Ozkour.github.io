@@ -3,8 +3,10 @@
 <form>
     <div *ngIf="fromLocationTemplate">
         <div class="origins" *ngFor="let Origin of defaultOrigins">
-            <p>{{ Origin[0] }}</p>
-            <input type="number" class="form-control" name="value" value="{{ Origin[1] }}" (input)="changeVal(Origin[0], $event)">
+            <div class="check" *ngIf="Origin[1] != ''">
+                <p>{{ Origin[0] }}</p>
+                <input type="number" class="form-control" name="value" value="{{ Origin[1] }}" (input)="changeVal(Origin[0], $event)">
+            </div>
         </div>
         
     </div>
@@ -24,6 +26,16 @@
                 <div class="card-body"><b>{{ Location.name }}</b>  ({{ Location.country}})</div>
             </div>
         </div>
-          <button class="btn btn-secondary" (click)="findAirports()" [ngStyle]="{'width': '100%'}">Find Flights</button>
     </div>
+    <!-- Ou alors demander un mois ? car vol à peu près équivalent à chaque période de l'année -->
+    <div *ngIf="dateTemplate"> 
+        <label for=""><h3>When do you want to organize your conference ?</h3></label>
+        <div>
+            <input type="radio" id="lessYear" name="date" value="less">
+            <label for="html">Less than a year</label><br>
+            <input type="radio" id="overYear" name="date" value="over">
+            <label for="css">Over a year</label><br>
+        </div>
+    </div>
+    <button class="btn btn-secondary" (click)="findAirports()" [ngStyle]="{'width': '100%'}">Find Flights</button>
 </form>
