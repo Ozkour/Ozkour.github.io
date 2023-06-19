@@ -1,15 +1,21 @@
 <h1><strong>Estimate the carbon footprint of your next conference.</strong></h1>
 <hr>
 <form>
-    <div *ngIf="fromLocationTemplate">
-        <div class="origins" *ngFor="let Origin of defaultOrigins">
-            <div class="check" *ngIf="Origin[1] != ''">
-                <p>{{ Origin[0] }}</p>
-                <input type="number" class="form-control" name="value" value="{{ Origin[1] }}" (input)="changeVal(Origin[0], $event)">
-            </div>
-        </div>
+    <table>
+    <thead>
+        <tr>
+            <th colspan="3">Set the number of attendees per country</th>
+        </tr>
+    </thead>
+    <tbody *ngIf="fromLocationTemplate">
+        <tr class="origins" *ngFor="let Origin of defaultOrigins">
+                <td *ngIf="Origin[1] != ''"><p class="name">{{ Origin[0] }}</p></td>
+                <td *ngIf="Origin[1] != ''"><input type="number" class="txt" name="value" value="{{ this.origins.get(Origin[0]) }}" (input)="changeVal(Origin[0], $event)"></td>
+                <td *ngIf="Origin[1] != ''"><input type="range" class="slider" name="value" max="2500" value="{{ this.origins.get(Origin[0]) }}" (input)="changeVal(Origin[0], $event)"></td>
+        </tr>
         
-    </div>
+    </tbody>
+    </table>
 
     <div *ngIf="toLocationTemplate">
         <label for=""><h3>Add an organization place :</h3></label>
@@ -19,7 +25,7 @@
                 <div class="delete" (click)="deleteCity(Location)">X</div>
             </div>
           </div>
-        <input type="text" class="form-control" name="to" [(ngModel)]="to"     (keypress)="handleToLocation()">
+        <input type="text" class="form-control" name="to" [(ngModel)]="to" (keypress)="handleToLocation()">
         <small>City search E.g. London</small>
         <div class="card">
             <div class="card-header" *ngFor="let Location of toLocation" (click)="handleDestination(Location)">
@@ -29,13 +35,8 @@
     </div>
     <!-- Ou alors demander un mois ? car vol à peu près équivalent à chaque période de l'année -->
     <div *ngIf="dateTemplate"> 
-        <label for=""><h3>When do you want to organize your conference ?</h3></label>
-        <div>
-            <input type="radio" id="lessYear" name="date" value="less">
-            <label for="html">Less than a year</label><br>
-            <input type="radio" id="overYear" name="date" value="over">
-            <label for="css">Over a year</label><br>
-        </div>
+        <label for="start"><h3>When do you want your conference to begin ?</h3></label>
+        <input type="date" id="start" name="trip_start" [(ngModel)]="trip_start" value="{{this.today}}" min="{{this.today}}" max="2099-12-31" (change)="handleDate()">
     </div>
     <button class="btn btn-secondary" (click)="findAirports()" [ngStyle]="{'width': '100%'}">Find Flights</button>
 </form>

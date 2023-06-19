@@ -64,10 +64,16 @@ Burundi,BI,
 Cabo Verde,CV,
 Cambodia,KH,
 Cameroon,CM,
-Canada,CA,YYC YVR
+Canada,CA,YYZ YVR YUL
+Canada1,CA1,YYZ
+Canada2,CA2,YVR
+Canada3,CA3,YUL
 Central African Republic,CF,
 Chad,TD,
 China,CN,CAN CKG SZX
+China1,CN1,CAN
+China2,CN2,CKG
+China3,CN3,SZX
 Comoros,KM,
 Congo,CG,
 Costa Rica,CR,

@@ -30,3 +30,20 @@
 .card-body{
     text-align: center;
 }
+
+.slide{
+    display: flex;
+    margin: 5px;
+}
+
+.name{
+    margin:0;
+}
+
+.slider, .txt{
+    margin-left: 20px;
+}
+
+#start{
+    margin-left: 20px;
+}
