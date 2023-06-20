@@ -11,8 +11,6 @@ Build et déploiement
 author etc.
 
 TODO
-formule CO2
-déplacer formulaire destinations en haut
 slider order by nb desc ou alphabetique
 ajouter res a côté du nom de ville + graphiques bar chart, bubble chart 2D google charts
 bouger slider met a jour le reste sans avoir a relancer

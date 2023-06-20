@@ -1,4 +1,4 @@
-.cities{
+.cities, .locations{
     display: flex;
 }
 
@@ -46,4 +46,23 @@
 
 #start{
     margin-left: 20px;
+}
+
+.btn{
+    position:fixed;
+    width: inherit;
+    bottom: 1%;
+    right: 1%;
+}
+
+.destinations, .results{
+    width:50%;
+}
+
+.tableDest{
+    width:100%;
+}
+
+.txt{
+    width: 100px;
 }

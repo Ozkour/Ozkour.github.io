@@ -26,6 +26,8 @@ CO2est: Map<string, number> | any = new Map();
 timeEst: any = new Map();
 specialCases: string[] = ['United States', 'Canada', 'China'];
 today: string = "";
+carbon_attendee_km: number = 0.09708;
+distance_correction: number = 1.09;
 
 constructor() { 
   const date = new Date();
@@ -124,7 +126,7 @@ constructor() {
     this.destinations.splice(this.destinations.indexOf(location),1);
   }
 
-  findAirports(){
+  estimate(){
     console.log("Loading...");
     // wait for fetches to be done and array to be filled 
     var fetches = new Promise(resolve => {
@@ -148,24 +150,25 @@ constructor() {
             var longOrigin = airportOrigin.get('long');
             var latDest = airportDest.get('lat');
             var longDest = airportDest.get('long');
+            var dist = this.haversineFormulaDistance(latOrigin, longOrigin, latDest, longDest);
             //carbon footprint is computed
-            sum += 1
-            // sum += (latOrigin+longOrigin)*(latDest+longDest)/2;
+            sum += this.distance_correction * dist * this.carbon_attendee_km;
           });
         });
         var nbAttendees = parseInt(this.origins.get(this.airports.get(origin)));
         // mean of routes for each origin-dest pair multiplied by the number of attendees
-        var estimation = sum / flights.length * nbAttendees;
+        var estimation = sum / flights.length;
         // add carbon footprint & time to destinations
-        this.CO2est.has(dest) ? this.CO2est.set(dest, this.CO2est.get(dest) + estimation) : this.CO2est.set(dest, estimation);
+        this.CO2est.has(dest) ? this.CO2est.set(dest, (this.CO2est.get(dest) * cptFlights.get(dest) + estimation*nbAttendees) / (cptFlights.get(dest)+nbAttendees)) : this.CO2est.set(dest, estimation);
         this.timeEst.has(dest) ? this.timeEst.set(dest, (this.timeEst.get(dest) * cptFlights.get(dest) + time*nbAttendees) / (cptFlights.get(dest)+nbAttendees)) : this.timeEst.set(dest, time);
         cptFlights.has(dest) ? cptFlights.set(dest,cptFlights.get(dest) + nbAttendees) : cptFlights.set(dest,nbAttendees);
         sum = 0;        
       });
-        console.log('time :', this.timeEst);
+        console.log(this.itineraries);
         console.log('CO2 :', this.CO2est);
+        console.log('time :', this.timeEst);
         console.log('cpt :',cptFlights);
-      
+        this.showResults();
     });
   }
 
@@ -175,7 +178,7 @@ constructor() {
     var origin = this.airports.get(currentOrigin[0]);
     var dest = this.specialCasesAirport(currentDest);
     if(this.origins.get(currentOrigin[0]) != "0" && origin != dest && (!this.specialCases.includes(currentOrigin[0]))){
-      await fetch(`http://localhost:5000/flights-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=2023-07-25`)
+      await fetch(`http://localhost:5000/flights-search?originCode=${origin}&destinationCode=${dest}&dateOfDeparture=${this.real_date}`)
         .then(response => response.json())
         .then(data => {
           if(data.data){
@@ -220,6 +223,10 @@ constructor() {
     else{
       return this.airports.get(dest.country);
     }
+  }
+
+  showResults(){
+
   }
 
   haversineFormulaDistance(lat1: any,lon1: any,lat2: any,lon2: any) {
@@ -286,22 +293,24 @@ constructor() {
 
   // set number of attendees for a country
   changeVal(country: any, event: any){
-    this.origins.set(country,event.target.value);
+    var val = Math.round(event.target.value);
+    this.origins.set(country,val);
     if(country == 'United States'){
-      this.origins.set('USA1', event.target.value/3);
-      this.origins.set('USA2', event.target.value/3);
-      this.origins.set('USA3', event.target.value/3);
+      this.origins.set('USA1', val/3);
+      this.origins.set('USA2', val/3);
+      this.origins.set('USA3', val/3);
     }
     else if(country == 'Canada'){
-      this.origins.set('Canada1', event.target.value/3);
-      this.origins.set('Canada2', event.target.value/3);
-      this.origins.set('Canada3', event.target.value/3);
+      this.origins.set('Canada1', val/3);
+      this.origins.set('Canada2', val/3);
+      this.origins.set('Canada3', val/3);
     }
     else if(country == 'China'){
-      this.origins.set('China1', event.target.value/3);
-      this.origins.set('China2', event.target.value/3);
-      this.origins.set('China3', event.target.value/3);
+      this.origins.set('China1', val/3);
+      this.origins.set('China2', val/3);
+      this.origins.set('China3', val/3);
     }
+    
   }
 
 }

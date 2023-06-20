@@ -1,22 +1,7 @@
 <h1><strong>Estimate the carbon footprint of your next conference.</strong></h1>
 <hr>
-<form>
-    <table>
-    <thead>
-        <tr>
-            <th colspan="3">Set the number of attendees per country</th>
-        </tr>
-    </thead>
-    <tbody *ngIf="fromLocationTemplate">
-        <tr class="origins" *ngFor="let Origin of defaultOrigins">
-                <td *ngIf="Origin[1] != ''"><p class="name">{{ Origin[0] }}</p></td>
-                <td *ngIf="Origin[1] != ''"><input type="number" class="txt" name="value" value="{{ this.origins.get(Origin[0]) }}" (input)="changeVal(Origin[0], $event)"></td>
-                <td *ngIf="Origin[1] != ''"><input type="range" class="slider" name="value" max="2500" value="{{ this.origins.get(Origin[0]) }}" (input)="changeVal(Origin[0], $event)"></td>
-        </tr>
-        
-    </tbody>
-    </table>
 
+<form>
     <div *ngIf="toLocationTemplate">
         <label for=""><h3>Add an organization place :</h3></label>
         <p *ngIf="destinations.length >0"><b>Selected cities :</b></p>
@@ -33,10 +18,46 @@
             </div>
         </div>
     </div>
-    <!-- Ou alors demander un mois ? car vol à peu près équivalent à chaque période de l'année -->
     <div *ngIf="dateTemplate"> 
         <label for="start"><h3>When do you want your conference to begin ?</h3></label>
         <input type="date" id="start" name="trip_start" [(ngModel)]="trip_start" value="{{this.today}}" min="{{this.today}}" max="2099-12-31" (change)="handleDate()">
     </div>
-    <button class="btn btn-secondary" (click)="findAirports()" [ngStyle]="{'width': '100%'}">Find Flights</button>
+
+    <div class="locations">
+        <div class="destinations">
+        <table class="tableDest">
+            <thead>
+                <tr>
+                    <th colspan="3">Set the number of attendees per country</th>
+                </tr>
+            </thead>
+            <tbody *ngIf="fromLocationTemplate">
+                <tr class="origins" *ngFor="let Origin of defaultOrigins">
+                        <td *ngIf="Origin[1] != ''"><p class="name">{{ Origin[0] }}</p></td>
+                        <td *ngIf="Origin[1] != ''"><input type="number" class="txt" name="value" min="0" step="1" value="{{ this.origins.get(Origin[0]) }}" (input)="changeVal(Origin[0], $event)"></td>
+                        <td *ngIf="Origin[1] != ''"><input type="range" class="slider" name="value" max="2500" value="{{ this.origins.get(Origin[0]) }}" (input)="changeVal(Origin[0], $event)"></td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+        <div class="results">
+            <table class="resultsTable" *ngIf="CO2est.size > 0">
+                <thead>
+                    <tr>
+                        <th>Place</th>
+                        <th>CO2 / attendee (kg)</th>
+                        <th>Trip time / attendee (min)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="dest" *ngFor="let Location of destinations">
+                        <td>{{Location.name}}</td>
+                        <td>{{CO2est.get(Location.name)}}</td>
+                        <td>{{timeEst.get(Location.name)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-secondary" (click)="estimate()" >Estimate the carbon footprint</button>
+        </div>
+    </div>
 </form>
